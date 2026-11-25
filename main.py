@@ -1,9 +1,11 @@
-import os
 from pathlib import Path
 
-# Returns RAW bytes
+# Returns RAW bytes, skips symlinks for now since, they mess up size for current directory
 def get_dir_size(path: Path, files: list[tuple[Path, int]]) -> int:
     # base case is when path is a file, then get the size and return it
+    if path.is_symlink():
+        print(f"{path.name} is symlink, skipping file")
+        return 0
     if path.is_file():
         file_size = path.stat().st_size
         files.append((path, file_size))
@@ -15,6 +17,16 @@ def get_dir_size(path: Path, files: list[tuple[Path, int]]) -> int:
         # for each path object, make recursive call
         size += get_dir_size(f, files)
     return size
+
+# returns array of tuples (direct_dir, size) ex: [(Downloads, 10gb), (Music, 500mb), (), ...]
+# work on this 
+def get_dir_size_direct_dir(path: Path, files: list[tuple[Path, int]]):
+    if path.is_symlink():
+        print(f"{path.name} is symlink, skipping file")
+        return 0
+    if path.is_file:
+        return 0
+        
 
 # Made this function even tho it only does one call because in future will do more than just sort, maybewww
 def sort_files_by_size(files: list[tuple[Path, int]]) -> list[tuple[Path, int]]:
@@ -45,6 +57,7 @@ def display_usage(sorted_files: list[tuple[Path, int]], total_fize_size: int) ->
 
         print(f"{file_path.name:^75}{f'{file_size:.2f} {unit_measurement}':^12}{f'{percentage_usage:.2f}%':^7}")
 
+# in this commit, will work on ignoring symbolink link, and permission files
 if __name__ == '__main__':
     print("-----------Simple Disk Analyzer-----------\n")
 
